@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart'; // Untuk navigasi
 import '../core/di/injection.dart';
+import '../../data/isar_service.dart'; // Untuk memanggil fungsi database
 import 'cubit/product_cubit.dart';
 import 'cubit/product_state.dart';
 
@@ -17,7 +19,16 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Katalog UTD Store Desi'),
           backgroundColor: const Color(0xFFF48FB1), // Soft Pink
-          foregroundColor: Colors.white, // Hilangkan const di sini
+          foregroundColor: Colors.white,
+          // Tombol navigasi menuju Halaman Bookmark
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bookmarks),
+              onPressed: () {
+                context.push('/bookmarks'); 
+              },
+            ),
+          ],
         ),
         body: BlocBuilder<ProductCubit, ProductState>(
           builder: (context, state) {
@@ -60,11 +71,23 @@ class HomePage extends StatelessWidget {
                           color: Color(0xFFF48FB1), // Harga jadi pink juga
                         )
                       ),
-                      // Tambahan tombol Bookmark untuk persiapan Poin 3 (Database Isar)
+                      // Tombol Bookmark untuk Database Isar
                       trailing: IconButton(
                         icon: const Icon(Icons.favorite_border, color: Color(0xFFF48FB1)),
-                        onPressed: () {
-                          // Nanti logika simpan ke Isar di sini
+                        onPressed: () async {
+                          // Memanggil IsarService untuk menyimpan/menghapus produk
+                          await locator<IsarService>().toggleBookmark(item);
+                          
+                          // Menampilkan pesan kecil (SnackBar) di bawah layar
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Status Favorit diperbarui! 🌸'),
+                                backgroundColor: Color(0xFFF48FB1),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),
