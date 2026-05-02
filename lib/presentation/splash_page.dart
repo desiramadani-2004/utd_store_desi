@@ -17,13 +17,13 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _startDelay() async {
-    // Memanggil aturan bisnis dari layer Domain (Delay sesuai NIM)
+    // Memanggil aturan bisnis dari layer Domain (Delay 2 detik)
     final delayInSeconds = GetSplashDelay().execute();
     
-    // Menunggu sesuai detik NIM
+    // Menunggu sesuai durasi yang ditentukan di layer Domain
     await Future.delayed(Duration(seconds: delayInSeconds));
     
-    // NAVIGASI ASLI: Pindah ke halaman Home
+    // Navigasi ke halaman Home menggunakan go_router
     if (mounted) {
       context.go('/home'); 
     }
@@ -31,25 +31,49 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.teal,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8BBD0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.storefront, size: 100, color: Colors.white),
-            SizedBox(height: 20),
-            Text(
-              'UTD Store Desi',
+            // Ikon Toko
+            const Icon(Icons.storefront, size: 100, color: Colors.white),
+            const SizedBox(height: 20),
+            
+            // --- NAMA LENGKAP ---
+            const Text(
+              'Desi Ramadani', 
               style: TextStyle(
-                fontSize: 28, 
+                fontSize: 26, 
                 color: Colors.white, 
-                fontWeight: FontWeight.bold
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
-            // Animasi loading
-            CircularProgressIndicator(color: Colors.white),
+            
+            const SizedBox(height: 10),
+            
+            // --- NIM ---
+            const Text(
+              'NIM: 20123042', 
+              style: TextStyle(
+                fontSize: 18, 
+                color: Colors.white70, 
+                fontWeight: FontWeight.w500,
+                letterSpacing: 1.2,
+              ),
+            ),
+            
+            const SizedBox(height: 40),
+            
+            // Animasi Loading
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 20),
+            
+            const Text(
+              'Loading...',
+              style: TextStyle(color: Colors.white54),
+            ),
           ],
         ),
       ),
