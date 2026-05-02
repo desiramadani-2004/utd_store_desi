@@ -36,14 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # 1. Routing & DI
-  go_router: ^13.2.0
-  get_it: ^7.6.7
+  go_router: ^17.2.3
+  get_it: ^9.2.1
   
   # 2. Networking
-  dio: ^5.4.1
+  dio: ^5.9.2
   
   # 2. State Management (Cubit)
-  flutter_bloc: ^8.1.4
+  flutter_bloc: ^9.1.1
   
   # 3. Reactive Local Database - Offline First (Isar)
   isar: ^3.1.0+1
