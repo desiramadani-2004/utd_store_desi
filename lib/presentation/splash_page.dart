@@ -17,17 +17,15 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _startDelay() async {
-    // Memanggil aturan bisnis (Logika Personal) dari layer Domain
+    // Memanggil aturan bisnis dari layer Domain (Delay sesuai NIM)
     final delayInSeconds = GetSplashDelay().execute();
     
     // Menunggu sesuai detik NIM
     await Future.delayed(Duration(seconds: delayInSeconds));
     
-    // Karena halaman Home belum ada, kita tampilkan pesan pop-up sementara
+    // NAVIGASI ASLI: Pindah ke halaman Home
     if (mounted) {
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text('Navigasi ke Home (Akan dibuat di Step 3)')),
-       );
+      context.go('/home'); 
     }
   }
 
@@ -50,6 +48,7 @@ class _SplashPageState extends State<SplashPage> {
               ),
             ),
             SizedBox(height: 20),
+            // Animasi loading
             CircularProgressIndicator(color: Colors.white),
           ],
         ),

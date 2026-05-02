@@ -1,8 +1,13 @@
 import 'package:get_it/get_it.dart';
+import '../../data/api_service.dart';
+import '../../presentation/cubit/product_cubit.dart';
 
 final locator = GetIt.instance;
 
 void setupLocator() {
-  // Nanti kita akan mendaftarkan pemanggil API (Dio), Database (Isar), dan Cubit di sini.
-  // Untuk saat ini biarkan kosong, tapi fungsinya wajib dipanggil di main.dart
+  // Mendaftarkan alat pengambil data (hanya dibuat 1 kali)
+  locator.registerLazySingleton<ApiService>(() => ApiService());
+
+  // Mendaftarkan pengatur layar (Cubit)
+  locator.registerFactory<ProductCubit>(() => ProductCubit(locator<ApiService>()));
 }
