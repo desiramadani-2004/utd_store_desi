@@ -23,6 +23,12 @@ class HomePage extends StatelessWidget {
           // Tombol navigasi menuju Halaman Bookmark
           actions: [
             IconButton(
+              icon: const Icon(Icons.currency_bitcoin),
+              onPressed: () {
+                context.push('/crypto'); 
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.bookmarks),
               onPressed: () {
                 context.push('/bookmarks'); 

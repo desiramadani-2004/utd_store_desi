@@ -10,7 +10,7 @@ class BookmarkPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF1F5), // Tema Soft Pink kamu
+      backgroundColor: const Color(0xFFFFF1F5), 
       appBar: AppBar(
         title: const Text('Produk Favoritku'),
         backgroundColor: const Color(0xFFF48FB1),
