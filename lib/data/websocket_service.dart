@@ -5,8 +5,7 @@ class WebSocketService {
   WebSocketChannel? _channel;
 
   void connect() {
-    // Menggunakan URL wajib dari dosen (CoinCap)
-    final wsUrl = Uri.parse('wss://ws.coincap.io/prices?assets=bitcoin');
+    final wsUrl = Uri.parse('wss://stream.binance.com:9443/ws/btcusdt@trade');
     _channel = WebSocketChannel.connect(wsUrl);
   }
 

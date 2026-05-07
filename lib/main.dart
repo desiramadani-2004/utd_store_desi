@@ -3,7 +3,6 @@ import 'core/routing/app_router.dart';
 import 'core/di/injection.dart';
 
 void main() {
-  // WAJIB: Panggil Dependency Injection sebelum aplikasi berjalan
   setupLocator();
   runApp(const MainApp());
 }
