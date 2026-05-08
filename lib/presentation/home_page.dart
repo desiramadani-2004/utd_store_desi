@@ -6,8 +6,6 @@ import '../core/di/injection.dart';
 import '../../data/isar_service.dart'; 
 import 'cubit/product_cubit.dart';
 import 'cubit/product_state.dart';
-
-// Import halaman profil yang baru dibuat
 import 'profile_page.dart'; 
 
 class HomePage extends StatelessWidget {
@@ -58,7 +56,6 @@ class HomePage extends StatelessWidget {
             ],
           ),
           actions: [
-            // TOMBOL PROFIL YANG SUDAH DIHUBUNGKAN
             IconButton(
               icon: const Icon(Icons.account_circle, size: 28), 
               onPressed: () {
@@ -88,7 +85,7 @@ class HomePage extends StatelessWidget {
                 itemCount: state.products.length,
                 itemBuilder: (context, index) {
                   final item = state.products[index];
-                  // GESTURE DETECTOR UNTUK POP UP SUDAH DIHAPUS
+      
                   return Card(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

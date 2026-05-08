@@ -51,7 +51,7 @@ class ProfilePage extends StatelessWidget {
                         Divider(),
                         _ProfileItem(icon: Icons.badge_outlined, label: 'NIM', value: '20123042'),
                         Divider(),
-                        _ProfileItem(icon: Icons.class_outlined, label: 'Kelas/Prodi', value: 'Informatika'),
+                        _ProfileItem(icon: Icons.class_outlined, label: 'Kelas/Prodi', value: 'C1. 23 Informatika'),
                         Divider(),
                         _ProfileItem(icon: Icons.email_outlined, label: 'Email', value: 'desi20123042@digitechuniversity.ac.id'),
                       ],
