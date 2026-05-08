@@ -50,7 +50,6 @@ class _CryptoPageState extends State<CryptoPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // PERBAIKAN DI SINI: Tipe datanya kita ubah jadi String agar klop dengan service-nya!
             StreamBuilder<String>(
               stream: _wsService.priceStream,
               builder: (context, snapshot) {
@@ -64,7 +63,6 @@ class _CryptoPageState extends State<CryptoPage> {
                   return const Text('Menunggu data dari server...');
                 }
 
-                // Karena dari websocket_service sudah diekstrak jadi teks, kita langsung ambil aja:
                 final price = snapshot.data;
 
                 return Card(
@@ -81,7 +79,8 @@ class _CryptoPageState extends State<CryptoPage> {
                         const Text('Harga Bitcoin Real-time', style: TextStyle(color: Colors.grey)),
                         const SizedBox(height: 8),
                         
-                        price == null 
+                        // PERBAIKAN DI SINI: Tambahkan pengecekan kata "MENUNGGU"
+                        (price == null || price == "MENUNGGU")
                           ? const Column(
                               children: [
                                 SizedBox(height: 16),
@@ -118,6 +117,7 @@ class _CryptoPageState extends State<CryptoPage> {
                   _isCalculating = true;
                 });
 
+                // Jangan lupa angka 42 ini nanti diganti dengan 2 digit NIM akhir kamu ya!
                 int duaDigitNim = 42; 
                 int result = await compute(calculateTax, duaDigitNim);
 

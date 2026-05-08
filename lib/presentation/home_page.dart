@@ -7,6 +7,9 @@ import '../../data/isar_service.dart';
 import 'cubit/product_cubit.dart';
 import 'cubit/product_state.dart';
 
+// Import halaman profil yang baru dibuat
+import 'profile_page.dart'; 
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -37,45 +40,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // FITUR : POP-UP DETAIL PRODUK
-  void _showProductDetail(BuildContext context, dynamic item) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: EdgeInsets.zero,
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.network(item.image, height: 200, fit: BoxFit.contain),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    const SizedBox(height: 8),
-                    Text('\$${item.price}', style: const TextStyle(color: Color(0xFFF48FB1), fontWeight: FontWeight.bold, fontSize: 20)),
-                    const SizedBox(height: 12),
-                    const Text('Deskripsi:', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(item.description ?? 'Tidak ada deskripsi.', textAlign: TextAlign.justify),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup', style: TextStyle(color: Color(0xFFF48FB1))))
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -94,7 +58,16 @@ class HomePage extends StatelessWidget {
             ],
           ),
           actions: [
-            IconButton(icon: const Icon(Icons.account_circle, size: 28), onPressed: () {}),
+            // TOMBOL PROFIL YANG SUDAH DIHUBUNGKAN
+            IconButton(
+              icon: const Icon(Icons.account_circle, size: 28), 
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              }
+            ),
             IconButton(icon: const Icon(Icons.battery_charging_full), onPressed: () => _getBattery(context)),
             IconButton(icon: const Icon(Icons.currency_bitcoin), onPressed: () => context.push('/crypto')),
             IconButton(icon: const Icon(Icons.bookmarks), onPressed: () => context.push('/bookmarks')),
@@ -115,48 +88,45 @@ class HomePage extends StatelessWidget {
                 itemCount: state.products.length,
                 itemBuilder: (context, index) {
                   final item = state.products[index];
-                  return GestureDetector(
-                    // KLIK UNTUK DETAIL
-                    onTap: () => _showProductDetail(context, item),
-                    child: Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Center(child: Image.network(item.image, fit: BoxFit.contain)),
+                  // GESTURE DETECTOR UNTUK POP UP SUDAH DIHAPUS
+                  return Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Center(child: Image.network(item.image, fit: BoxFit.contain)),
+                              ),
+                              Positioned(
+                                top: 5, right: 5,
+                                child: IconButton(
+                                  icon: const Icon(Icons.bookmark_border, color: Color(0xFFF48FB1)),
+                                  onPressed: () async {
+                                    await locator<IsarService>().toggleBookmark(item);
+                                    if (context.mounted) _showStyledSnackBar(context, 'Bookmark diperbarui! 🌸');
+                                  },
                                 ),
-                                Positioned(
-                                  top: 5, right: 5,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.bookmark_border, color: Color(0xFFF48FB1)),
-                                    onPressed: () async {
-                                      await locator<IsarService>().toggleBookmark(item);
-                                      if (context.mounted) _showStyledSnackBar(context, 'Bookmark diperbarui! 🌸');
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                const SizedBox(height: 5),
-                                Text('\$${item.price}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF48FB1))),
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              const SizedBox(height: 5),
+                              Text('\$${item.price}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF48FB1))),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 },

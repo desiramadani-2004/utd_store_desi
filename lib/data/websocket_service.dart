@@ -5,7 +5,7 @@ class WebSocketService {
   late WebSocketChannel _channel;
 
   void connect() {
-    // LINK RESMI DARI DOSEN (Wajib WSS, bukan HTTP/HTTPS)
+    
     _channel = WebSocketChannel.connect(
       Uri.parse('wss://ws.coincap.io/prices?assets=bitcoin'),
     );
