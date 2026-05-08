@@ -50,23 +50,22 @@ class _CryptoPageState extends State<CryptoPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            StreamBuilder<Map<String, dynamic>>(
-              stream: _wsService.cryptoStream,
+            // PERBAIKAN DI SINI: Tipe datanya kita ubah jadi String agar klop dengan service-nya!
+            StreamBuilder<String>(
+              stream: _wsService.priceStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator(color: Color(0xFFF48FB1));
                 }
                 if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Text('Error Koneksi: ${snapshot.error}', textAlign: TextAlign.center);
                 }
                 if (!snapshot.hasData) {
                   return const Text('Menunggu data dari server...');
                 }
 
-                final data = snapshot.data!;
-                
-                // JURUS ANTI-GAGAL: Cari harga pakai kunci 'bitcoin' (CoinCap) atau 'p' (Binance)
-                final price = data['bitcoin']?.toString() ?? data['p']?.toString();
+                // Karena dari websocket_service sudah diekstrak jadi teks, kita langsung ambil aja:
+                final price = snapshot.data;
 
                 return Card(
                   color: Colors.white,
@@ -83,15 +82,12 @@ class _CryptoPageState extends State<CryptoPage> {
                         const SizedBox(height: 8),
                         
                         price == null 
-                          ? Column(
+                          ? const Column(
                               children: [
-                                const SizedBox(height: 16),
-                                const CircularProgressIndicator(color: Color(0xFFF48FB1)),
-                                const SizedBox(height: 8),
-                                const Text('Menunggu pergerakan pasar...', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                const SizedBox(height: 16),
-                                // ALAT DETEKTIF: Munculkan data asli dari server kalau formatnya aneh
-                                Text('Log Server: $data', style: const TextStyle(fontSize: 10, color: Colors.red), textAlign: TextAlign.center),
+                                SizedBox(height: 16),
+                                CircularProgressIndicator(color: Color(0xFFF48FB1)),
+                                SizedBox(height: 8),
+                                Text('Menunggu pergerakan pasar...', style: TextStyle(fontSize: 12, color: Colors.grey)),
                               ],
                             )
                           : Text(
@@ -147,7 +143,7 @@ class _CryptoPageState extends State<CryptoPage> {
                         Text('Menghitung berat...')
                       ],
                     )
-                  : const Text('Kalkulasi Pajak Kripto'),
+                  : const Text('Kalkulasi Pajak Kripto (Isolate)'),
             ),
           ],
         ),
