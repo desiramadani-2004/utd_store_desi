@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // WAJIB DITAMBAHKAN untuk MethodChannel
+import 'package:flutter/services.dart'; 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart'; 
 import '../core/di/injection.dart';
@@ -10,39 +10,78 @@ import 'cubit/product_state.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // 1. Deklarasi MethodChannel (Sesuai dengan nama di Kotlin)
   static const platform = MethodChannel('com.desi.utd_store/native');
 
-  // 2. Fungsi memanggil Native Toast (POIN 5)
+  // FUNGSI NATIVE
   Future<void> _showNativeToast() async {
     try {
       await platform.invokeMethod('showToast', {"message": "Halo dari Native Android! - Desi"});
     } on PlatformException catch (e) {
-      debugPrint("Gagal memanggil toast: '${e.message}'.");
+      debugPrint("Gagal Toast: ${e.message}");
     }
   }
 
-  // 3. Fungsi memanggil Persentase Baterai (POIN 5)
   Future<void> _getBattery(BuildContext context) async {
     try {
       final int result = await platform.invokeMethod('getBatteryLevel');
-      // Menampilkan baterai di layar menggunakan SnackBar
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sisa Baterai HP: $result% 🔋', style: const TextStyle(fontWeight: FontWeight.bold)),
-            backgroundColor: const Color(0xFFF48FB1),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        _showStyledSnackBar(context, 'Sisa Baterai HP: $result% 🔋');
       }
     } on PlatformException catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal cek baterai: ${e.message}')),
-        );
-      }
+      if (context.mounted) _showStyledSnackBar(context, 'Gagal: ${e.message}');
     }
+  }
+
+  // Fungsi helper buat SnackBar
+  void _showStyledSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFFF48FB1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.only(bottom: 30, left: 50, right: 50),
+      ),
+    );
+  }
+
+  // FITUR : POP-UP DETAIL PRODUK
+  void _showProductDetail(BuildContext context, dynamic item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Image.network(item.image, height: 200, fit: BoxFit.contain),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 8),
+                    Text('\$${item.price}', style: const TextStyle(color: Color(0xFFF48FB1), fontWeight: FontWeight.bold, fontSize: 20)),
+                    const SizedBox(height: 12),
+                    const Text('Deskripsi:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(item.description ?? 'Tidak ada deskripsi.', textAlign: TextAlign.justify),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup', style: TextStyle(color: Color(0xFFF48FB1))))
+        ],
+      ),
+    );
   }
 
   @override
@@ -52,93 +91,79 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFFFFF1F5), 
         appBar: AppBar(
-          title: const Text('Katalog UTD Store Desi', style: TextStyle(fontSize: 18)),
           backgroundColor: const Color(0xFFF48FB1), 
           foregroundColor: Colors.white,
+          elevation: 0,
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('UTD Store', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              Text('Desi', style: TextStyle(fontSize: 14, color: Colors.white70)),
+            ],
+          ),
           actions: [
-            // TOMBOL TOAST NATIVE
-            IconButton(
-              icon: const Icon(Icons.message),
-              tooltip: 'Test Native Toast',
-              onPressed: _showNativeToast,
-            ),
-            // TOMBOL CEK BATERAI NATIVE
-            IconButton(
-              icon: const Icon(Icons.battery_charging_full),
-              tooltip: 'Cek Baterai',
-              onPressed: () => _getBattery(context),
-            ),
-            // TOMBOL CRYPTO
-            IconButton(
-              icon: const Icon(Icons.currency_bitcoin),
-              tooltip: 'Live Crypto',
-              onPressed: () {
-                context.push('/crypto'); 
-              },
-            ),
-            // TOMBOL BOOKMARK
-            IconButton(
-              icon: const Icon(Icons.bookmarks),
-              tooltip: 'Favorit',
-              onPressed: () {
-                context.push('/bookmarks'); 
-              },
-            ),
+            IconButton(icon: const Icon(Icons.message), onPressed: _showNativeToast),
+            IconButton(icon: const Icon(Icons.battery_charging_full), onPressed: () => _getBattery(context)),
+            IconButton(icon: const Icon(Icons.currency_bitcoin), onPressed: () => context.push('/crypto')),
+            IconButton(icon: const Icon(Icons.bookmarks), onPressed: () => context.push('/bookmarks')),
           ],
         ),
         body: BlocBuilder<ProductCubit, ProductState>(
           builder: (context, state) {
-            if (state is ProductLoading) {
-              return const Center(child: CircularProgressIndicator(color: Color(0xFFF48FB1)));
-            } else if (state is ProductError) {
-              return Center(child: Text('Yah Error: ${state.message}'));
-            } else if (state is ProductLoaded) {
-              final products = state.products;
-              return ListView.builder(
-                itemCount: products.length,
+            if (state is ProductLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFFF48FB1)));
+            if (state is ProductLoaded) {
+              return GridView.builder(
+                padding: const EdgeInsets.all(12),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, 
+                  childAspectRatio: 0.7, 
+                  crossAxisSpacing: 12, 
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: state.products.length,
                 itemBuilder: (context, index) {
-                  final item = products[index];
-                  return Card(
-                    color: Colors.white,
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          item.image,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                        ),
-                      ),
-                      title: Text(
-                        item.title, 
-                        maxLines: 1, 
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        'Harga: \$${item.price}', 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          color: Color(0xFFF48FB1), 
-                        )
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.favorite_border, color: Color(0xFFF48FB1)),
-                        onPressed: () async {
-                          await locator<IsarService>().toggleBookmark(item);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Status Favorit diperbarui! 🌸'),
-                                backgroundColor: Color(0xFFF48FB1),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          }
-                        },
+                  final item = state.products[index];
+                  return GestureDetector(
+                    // KLIK UNTUK DETAIL
+                    onTap: () => _showProductDetail(context, item),
+                    child: Card(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Center(child: Image.network(item.image, fit: BoxFit.contain)),
+                                ),
+                                Positioned(
+                                  top: 5, right: 5,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.bookmark_border, color: Color(0xFFF48FB1)),
+                                    onPressed: () async {
+                                      await locator<IsarService>().toggleBookmark(item);
+                                      if (context.mounted) _showStyledSnackBar(context, 'Bookmark diperbarui! 🌸');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                const SizedBox(height: 5),
+                                Text('\$${item.price}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF48FB1))),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
