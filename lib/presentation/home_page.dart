@@ -12,15 +12,7 @@ class HomePage extends StatelessWidget {
 
   static const platform = MethodChannel('com.desi.utd_store/native');
 
-  // FUNGSI NATIVE
-  Future<void> _showNativeToast() async {
-    try {
-      await platform.invokeMethod('showToast', {"message": "Halo dari Native Android! - Desi"});
-    } on PlatformException catch (e) {
-      debugPrint("Gagal Toast: ${e.message}");
-    }
-  }
-
+  //baterai
   Future<void> _getBattery(BuildContext context) async {
     try {
       final int result = await platform.invokeMethod('getBatteryLevel');
@@ -102,7 +94,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
           actions: [
-            IconButton(icon: const Icon(Icons.message), onPressed: _showNativeToast),
+            IconButton(icon: const Icon(Icons.account_circle, size: 28), onPressed: () {}),
             IconButton(icon: const Icon(Icons.battery_charging_full), onPressed: () => _getBattery(context)),
             IconButton(icon: const Icon(Icons.currency_bitcoin), onPressed: () => context.push('/crypto')),
             IconButton(icon: const Icon(Icons.bookmarks), onPressed: () => context.push('/bookmarks')),
